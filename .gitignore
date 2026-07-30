@@ -1,0 +1,35 @@
+__pycache__/
+*.py[cod]
+*$py.class
+
+.pytest_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+
+*.egg-info/
+build/
+dist/
+
+.venv/
+venv/
+.env
+
+# Keep experimental and example data out of the repository.
+*.csv
+*.tsv
+*.dat
+*.xls
+*.xlsx
+*.npy
+*.npz
+*.mat
+!tests/fixtures/matlab_reference.mat
+
+# Legacy MATLAB and packaged artifacts are outside this Python repository.
+*.fig
+*.prj
+*.zip
+
+.DS_Store
+Thumbs.db
