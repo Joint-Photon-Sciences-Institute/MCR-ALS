@@ -11,19 +11,19 @@ MCR-ALS resolves a measured data matrix into concentration and spectral profiles
 The core model is:
 
 ```text
-data ? concentrations @ spectra
+data ~= concentrations @ spectra
 ```
 
 The solver alternates between estimating concentrations from the current spectra and estimating spectra from the current concentrations. At each half-iteration it applies the configured constraints, then evaluates residuals, lack of fit, explained variance, and convergence. The best solution encountered is retained.
 
 The main modules are:
 
-- `mcr_als/solver.py` ? ALS iteration, convergence, multi-experiment handling, and result assembly.
-- `mcr_als/options.py` ? dataclasses for solver and constraint configuration.
-- `mcr_als/helpers.py` ? rank reproduction, nonnegative least squares, unimodality, closure, normalization, and multilinear helpers.
-- `mcr_als/correlation.py`, `weighted.py`, and `kinetics.py` ? advanced constraint and fitting routines.
-- `mcr_als/gui.py` and `gui_state.py` ? desktop interface and GUI configuration state.
-- `tests/` ? unit, end-to-end, GUI-state, and MATLAB parity tests.
+- `mcr_als/solver.py`: ALS iteration, convergence, multi-experiment handling, and result assembly.
+- `mcr_als/options.py`: dataclasses for solver and constraint configuration.
+- `mcr_als/helpers.py`: rank reproduction, nonnegative least squares, unimodality, closure, normalization, and multilinear helpers.
+- `mcr_als/correlation.py`, `weighted.py`, and `kinetics.py`: advanced constraint and fitting routines.
+- `mcr_als/gui.py` and `gui_state.py`: desktop interface and GUI configuration state.
+- `tests/`: unit, end-to-end, GUI-state, and MATLAB parity tests.
 
 All numerical inputs are converted to NumPy `float64` arrays. The implementation follows the original MATLAB iteration order, constraint order, stopping rule, and output formulas where supported. Small differences can still occur between MATLAB and SciPy because their LAPACK/BLAS implementations may differ.
 
