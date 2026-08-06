@@ -24,10 +24,31 @@ The main modules are:
 - `mcr_als/correlation.py`, `weighted.py`, and `kinetics.py`: advanced constraint and fitting routines.
 - `mcr_als/gui.py` and `gui_state.py`: desktop interface and GUI configuration state.
 - `tests/`: unit, end-to-end, GUI-state, and MATLAB parity tests.
+- `packaging/windows/`: reproducible PyInstaller and Inno Setup build configuration.
 
 All numerical inputs are converted to NumPy `float64` arrays. The implementation follows the original MATLAB iteration order, constraint order, stopping rule, and output formulas where supported. Small differences can still occur between MATLAB and SciPy because their LAPACK/BLAS implementations may differ.
 
 ## Installation
+
+### Windows installer (recommended)
+
+[Download MCR-ALS for Windows](https://github.com/Joint-Photon-Sciences-Institute/MCR-ALS/raw/refs/heads/main/installer/MCR-ALS-Setup-0.1.0-Windows-x64.exe)
+
+1. Download `MCR-ALS-Setup-0.1.0-Windows-x64.exe`.
+2. Double-click the downloaded file.
+3. Follow the setup wizard, then launch MCR-ALS from the Desktop or Start Menu shortcut.
+
+The installer is for 64-bit Windows and includes Python plus all required libraries. The user does not need Python, MATLAB, administrator rights, or a command-line interface. It installs for the current Windows user and can be removed later from **Settings > Apps > Installed apps**.
+
+The installer is not digitally signed. Windows SmartScreen may display a warning for the first download. Only continue if the file came from this repository and its SHA-256 checksum matches:
+
+```text
+D99224FCAE83D9B056CF80E5D8B3195448C1F072D76F3810779EF55183E282E5
+```
+
+If SmartScreen appears, select **More info**, verify that the filename is correct, and then select **Run anyway**.
+
+### Install from Python source
 
 Python 3.10 or newer is required. From a clone of this repository:
 

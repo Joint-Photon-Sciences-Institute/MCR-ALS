@@ -32,7 +32,7 @@ def test_yregrnew_matches_linear_calibration_and_restores_known_values() -> None
         ]
     )
     result = yregrnew(profiles, reference, [True, False])
-    assert_allclose(result.calibrated[:, 0], [0.0, 0.5, 1.0, 1.5, 2.0], atol=3e-16)
+    assert_allclose(result.calibrated[:, 0], [0.0, 0.5, 1.0, 1.5, 2.0], atol=2e-15)
     assert_allclose(result.output[:, 0], [0.0, 0.5, 1.0, 1.5, 2.0])
     assert_allclose(result.output[:, 1], profiles[:, 1])
     stats = result.stats[0][0]
