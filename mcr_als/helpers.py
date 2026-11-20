@@ -531,10 +531,13 @@ def pure(
     scaled = d / length[None, :]
     correlation = (scaled.T @ scaled) / n_rows
 
-    weight0 = ll / (length**2)
-    purity0 = weight0 * purity0
+    # pure.m selects the first pure variable from the unweighted purity
+    # spectrum and only then applies the first weight, which is used for the
+    # remaining variables.
     indices = np.empty(rank, dtype=np.intp)
     indices[0] = int(np.argmax(purity0))
+    weight0 = ll / (length**2)
+    purity0 = weight0 * purity0
     for i in range(1, rank):
         weighted_purity = np.empty(n_columns, dtype=np.float64)
         for variable in range(n_columns):

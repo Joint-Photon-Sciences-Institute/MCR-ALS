@@ -207,6 +207,24 @@ def test_pure_returns_selected_normalized_rows_and_indices() -> None:
     assert_allclose(profiles, normv2(data[:, indices].T))
 
 
+def test_pure_selects_first_variable_before_weighting() -> None:
+    # pure.m takes the first pure variable from the unweighted purity spectrum
+    # and applies the weights afterwards.  Here the two orderings disagree;
+    # the expected indices are those returned by the MATLAB routine.
+    data = np.array(
+        [
+            [0.0, 0.4, 0.2, 0.1],
+            [0.0, 0.1, 2.9, 0.2],
+            [0.0, 0.0, 2.3, 0.1],
+            [0.0, 0.1, 4.0, 0.5],
+            [0.3, 0.2, 2.5, 0.1],
+        ]
+    )
+    profiles, indices = pure(data, 2, 5.0)
+    assert indices.tolist() == [0, 2]
+    assert_allclose(profiles, normv2(data[:, [0, 2]].T))
+
+
 def test_efa_forward_backward_and_arranged_profiles() -> None:
     data = np.array(
         [

@@ -527,9 +527,20 @@ def _apply_correlation(
         default=True,
         name="correlation.component_mask",
     )
+    # alsOptimization.m follows the regression with conc(iisel)=csel(iisel),
+    # where iisel marks every finite reference entry.  Known values are thus
+    # imposed for all components, including those left out of the regression
+    # and those with fewer than two calibration points.
+    known = np.isfinite(reference)
     if config.model == "global" or len(blocks) == 1:
         result = yregrnew(concentrations, reference, component_mask)
-        return result.output, result
+        constrained = result.output.copy()
+        constrained[known] = reference[known]
+        return constrained, CorrelationResult(
+            output=constrained.copy(),
+            calibrated=result.calibrated,
+            stats=result.stats,
+        )
 
     output = concentrations.copy()
     calibrated = concentrations.copy()
@@ -561,6 +572,8 @@ def _apply_correlation(
                     - base.offset
                 ) / base.slope
         output[reference == 0.0] = 0.0
+    else:
+        output[known] = reference[known]
 
     aggregate = CorrelationResult(
         output=output.copy(),

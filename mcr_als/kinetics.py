@@ -13,6 +13,9 @@ from ._matlab import mldivide
 
 FloatArray = NDArray[np.float64]
 
+_ODE_RELATIVE_TOLERANCE = 1.0e-8
+_ODE_ABSOLUTE_TOLERANCE = 1.0e-10
+
 
 @dataclass(frozen=True, slots=True)
 class KineticOptimizationResult:
@@ -63,7 +66,14 @@ def integrate_kinetics(
     rate_constants: ArrayLike,
     choose: ArrayLike | None = None,
 ) -> FloatArray:
-    """Integrate with the ode45 tolerances used by the MATLAB routines."""
+    """Integrate the kinetic model at the requested times.
+
+    The MATLAB routines call ``ode45`` with ``RelTol=1e-2`` and
+    ``AbsTol=1e-3``. SciPy's ``RK45`` is markedly less accurate than ``ode45``
+    at those nominal settings, which biases the fitted rate constants by a few
+    tenths of a percent. Tight tolerances are used instead so the profiles are
+    those of the model itself.
+    """
     time_values = np.asarray(times, dtype=np.float64).reshape(-1)
     initial = np.asarray(initial_concentrations, dtype=np.float64).reshape(-1)
     if time_values.size < 1 or not np.all(np.isfinite(time_values)):
@@ -81,8 +91,8 @@ def integrate_kinetics(
         initial,
         method="RK45",
         t_eval=time_values,
-        rtol=1.0e-2,
-        atol=1.0e-3,
+        rtol=_ODE_RELATIVE_TOLERANCE,
+        atol=_ODE_ABSOLUTE_TOLERANCE,
     )
     if not solution.success:
         raise RuntimeError(f"kinetic integration failed: {solution.message}")
@@ -176,7 +186,9 @@ def nglmglob(
             colored_mask,
         )
         ssq = float(residual @ residual)
-        convergence = (old_ssq - ssq) / old_ssq
+        # An exact fit leaves old_ssq at zero.  MATLAB evaluates 0/0 as NaN,
+        # which takes none of the branches below and repeats the last step.
+        convergence = (old_ssq - ssq) / old_ssq if old_ssq != 0.0 else float("nan")
         if convergence >= 0.0 and abs(convergence) >= convergence_limit:
             marquardt /= 3.0
             old_ssq = ssq

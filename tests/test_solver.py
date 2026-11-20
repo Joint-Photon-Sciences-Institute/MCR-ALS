@@ -62,11 +62,13 @@ def test_one_iteration_matches_matlab_update_formulas() -> None:
     expected_s = np.linalg.lstsq(expected_c, reproduced, rcond=None)[0]
     assert_allclose(result.concentrations, expected_c, rtol=2e-12, atol=2e-13)
     assert_allclose(result.spectra, expected_s, rtol=2e-12, atol=2e-13)
+    # An unconstrained update reproduces the PCA-filtered data, so both
+    # residuals are round-off noise; compare them on the scale of the data.
     assert_allclose(
         result.residual_pca,
         reproduced - expected_c @ expected_s,
-        rtol=2e-12,
-        atol=5e-16,
+        rtol=0.0,
+        atol=1e-13 * float(np.max(np.abs(reproduced))),
     )
     assert result.status == "max_iterations"
     assert result.best_iteration == 1

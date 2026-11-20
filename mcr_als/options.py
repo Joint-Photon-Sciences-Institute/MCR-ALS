@@ -140,7 +140,11 @@ class CorrelationOptions:
     """Linear calibration constraint translated from ``correlCons``.
 
     Finite entries in ``reference`` are known concentrations and NaNs are
-    unknown. ``component_mask`` selects the regressed components.
+    unknown. ``component_mask`` selects the regressed components. As in the
+    MATLAB toolbox, every finite reference entry is imposed on the
+    concentrations after the regression, including entries of components that
+    are not regressed; use NaN wherever a value must stay free. The local model
+    with ``matrix_effect`` only forces zero reference entries.
     """
 
     enabled: bool = True

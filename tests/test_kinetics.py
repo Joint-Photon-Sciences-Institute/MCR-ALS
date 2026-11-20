@@ -31,6 +31,34 @@ def test_kinetic_derivative_matches_first_order_mass_balance() -> None:
     assert_allclose(derivative, [-0.4, 0.4], rtol=0.0, atol=1e-15)
 
 
+def test_integrate_kinetics_is_accurate_for_consecutive_reactions() -> None:
+    # A -> B -> C has a closed-form solution.  The integration must follow the
+    # model closely enough not to bias fitted rate constants.
+    orders = np.array([[1.0, 0.0, 0.0], [0.0, 1.0, 0.0]])
+    stoichiometry = np.array([[-1.0, 0.0], [1.0, -1.0], [0.0, 1.0]])
+    k1, k2 = 0.3, 0.08
+    times = np.linspace(0.0, 30.0, 40)
+    a = np.exp(-k1 * times)
+    b = k1 / (k2 - k1) * (np.exp(-k1 * times) - np.exp(-k2 * times))
+    expected = np.column_stack([a, b, 1.0 - a - b])
+    calculated = integrate_kinetics(
+        times, [1.0, 0.0, 0.0], orders, stoichiometry, [k1, k2]
+    )
+    assert_allclose(calculated, expected, rtol=0.0, atol=1e-7)
+
+    fit = opt_kinglob(
+        [expected],
+        stoichiometry,
+        orders,
+        [[1.0, 0.0, 0.0]],
+        [0.2, 0.05],
+        [times],
+        None,
+        [1, 1, 1],
+    )
+    assert_allclose(fit.rate_constants, [k1, k2], rtol=1e-5)
+
+
 def test_integrate_kinetics_matches_first_order_solution() -> None:
     orders, stoichiometry = first_order_model()
     times = np.linspace(0.0, 5.0, 21)
